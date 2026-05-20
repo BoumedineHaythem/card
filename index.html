@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="NeoBank" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="description" content="Premium digital banking — NeoBank" />
+
+  <title>NeoBank</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Realistic Fintech Fonts: Inter for UI, Outfit for Numbers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- SPLASH SCREEN -->
+  <div id="splash-screen">
+    <div class="splash-inner">
+      <div class="splash-logo">
+        <div class="logo-icon"><i class="fa-solid fa-building-columns"></i></div>
+      </div>
+      <div class="splash-title">NeoBank</div>
+      <div class="splash-sub">Premium Banking</div>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="screen hidden">
+    <div class="login-bg">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+    </div>
+    <div class="login-content">
+      <div class="login-logo">
+        <div class="mini-logo"><i class="fa-solid fa-building-columns"></i></div>
+        <span>NeoBank</span>
+      </div>
+      <div class="login-headline">
+        <h1>Welcome<br/>Back.</h1>
+        <p>Securely access your portfolio.</p>
+      </div>
+      <div class="login-form">
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="haythem@neobank.com" value="haythem@neobank.com" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="login-password" placeholder="••••••••" value="password123" />
+            <i class="fa-solid fa-eye toggle-pw" id="toggle-pw"></i>
+          </div>
+        </div>
+        <div class="forgot-link">Forgot Password?</div>
+        <button class="btn-primary" id="login-btn">
+          <span>Sign In</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <div class="login-biometric">
+          <div class="bio-divider"><span>or authenticate with</span></div>
+          <div class="bio-options">
+            <button class="bio-btn" id="face-id-btn">
+              <i class="fa-solid fa-face-viewfinder"></i>
+              <span>Face ID</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app" class="hidden">
+
+    <!-- TOP NOTIFICATION BAR -->
+    <div id="notification-bar" class="notification-bar hidden">
+      <i class="fa-solid fa-bell"></i>
+      <span id="notification-text">Direct debit processed successfully.</span>
+      <button id="notif-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- SCREENS -->
+    <!-- DASHBOARD -->
+    <div id="screen-dashboard" class="app-screen active">
+      <div class="screen-content">
+        <div class="dash-header">
+          <div class="user-info">
+            <div class="avatar">HB</div>
+            <div>
+              <div class="greeting" id="greeting-text">Good Morning</div>
+              <div class="user-name">Haythem Boumedine</div>
+            </div>
+          </div>
+          <button class="notif-btn" id="notif-trigger">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notif-dot"></span>
+          </button>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+          <div class="card-top">
+            <div class="card-label">Available Balance</div>
+            <div class="card-type">Premium Metal</div>
+          </div>
+          <div class="card-balance">
+            <span class="currency">€</span>
+            <!-- Realistic Number -->
+            <span class="amount" id="main-balance">53,782</span>
+            <span class="cents">.45</span>
+          </div>
+          <div class="card-bottom">
+            <div class="balance-change positive">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+              <span>+€2,145.80 this month</span>
+            </div>
+            <div class="card-logo"><i class="fa-brands fa-cc-mastercard"></i></div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-title">Quick Actions</div>
+        <div class="quick-actions">
+          <button class="action-btn" id="send-btn">
+            <div class="action-icon"><i class="fa-solid fa-arrow-up"></i></div>
+            <span>Send</span>
+          </button>
+          <button class="action-btn" id="receive-btn">
+            <div class="action-icon"><i class="fa-solid fa-arrow-down"></i></div>
+            <span>Receive</span>
+          </button>
+          <button class="action-btn" onclick="navigateTo('cards')">
+            <div class="action-icon"><i class="fa-solid fa-credit-card"></i></div>
+            <span>Cards</span>
+          </button>
+          <button class="action-btn">
+            <div class="action-icon"><i class="fa-solid fa-exchange-alt"></i></div>
+            <span>Exchange</span>
+          </button>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="section-title">
+          Recent Transactions
+          <span class="see-all" onclick="navigateTo('transactions')">See All</span>
+        </div>
+        <div class="transactions-list" id="recent-txns"></div>
+
+        <div style="height: 100px;"></div>
+      </div>
+    </div>
+
+<!-- TRANSACTIONS (History) -->
+    <div id="screen-transactions" class="app-screen">
+      <div class="screen-content">
+        <div class="page-header">
+          <h2>History</h2>
+        </div>
+        <div class="search-bar ios-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search merchants, categories..." id="txn-search" />
+        </div>
+        <div class="filter-pills">
+          <button class="pill active" data-filter="all">All</button>
+          <button class="pill" data-filter="income"><i class="fa-solid fa-arrow-down"></i> In</button>
+          <button class="pill" data-filter="expense"><i class="fa-solid fa-arrow-up"></i> Out</button>
+        </div>
+        <div class="transactions-list full" id="all-txns">
+          <!-- Populated by JS with grouped dates -->
+        </div>
+        <div style="height: 100px;"></div>
+      </div>
+    </div>
+
+    <!-- CARDS -->
+    <div id="screen-cards" class="app-screen">
+      <div class="screen-content">
+        <div class="page-header">
+          <h2>Cards</h2>
+          <button class="icon-btn-subtle"><i class="fa-solid fa-plus"></i></button>
+        </div>
+
+        <!-- Premium Metallic Card -->
+<!-- Hyper-Realistic Digital Card -->
+        <div class="card-wrapper">
+          <div class="elite-card">
+            <!-- Animated Metallic Sheen -->
+            <div class="card-sheen"></div>
+            
+            <div class="card-top">
+              <div class="card-brand-text">NEOBANK <span class="metal-tag">TITANIUM</span></div>
+              <div class="card-contactless"><i class="fa-solid fa-wifi"></i></div>
+            </div>
+            
+            <div class="card-middle">
+              <!-- Realistic CSS Chip -->
+              <div class="emv-chip">
+                <div class="chip-line"></div>
+                <div class="chip-line"></div>
+                <div class="chip-line"></div>
+              </div>
+            </div>
+            
+            <div class="card-bottom">
+              <div class="card-details">
+                <div class="card-number font-numbers">4892  ••••  ••••  7341</div>
+                <div class="card-name-expiry">
+                  <span class="c-name">HAYTHEM BOUMEDINE</span>
+                  <span class="c-exp font-numbers">09/29</span>
+                </div>
+              </div>
+              <div class="card-network">
+                <i class="fa-brands fa-cc-mastercard"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Sleek Grid Controls -->
+        <div class="card-controls-grid">
+          <div class="ctrl-box active">
+            <i class="fa-solid fa-wifi"></i>
+            <span>Contactless</span>
+          </div>
+          <div class="ctrl-box active">
+            <i class="fa-solid fa-globe"></i>
+            <span>Online</span>
+          </div>
+          <div class="ctrl-box">
+            <i class="fa-solid fa-snowflake"></i>
+            <span>Freeze Card</span>
+          </div>
+          <div class="ctrl-box">
+            <i class="fa-solid fa-eye-slash"></i>
+            <span>Show PIN</span>
+          </div>
+        </div>
+
+        <!-- iOS Style Limit Card -->
+        <div class="settings-group limits-group">
+          <div class="limit-header">
+            <span>Daily Spending Limit</span>
+            <span class="limit-amounts font-numbers">€1,450 / €5k</span>
+          </div>
+          <div class="ios-progress-bar"><div class="ios-progress-fill" style="width: 29%;"></div></div>
+          <p class="limit-subtext">Resets in 14 hours</p>
+        </div>
+
+        <div style="height: 100px;"></div>
+      </div>
+    </div>
+
+    <!-- STATISTICS (Analytics) -->
+    <div id="screen-stats" class="app-screen">
+      <div class="screen-content">
+        <div class="page-header">
+          <h2>Analytics</h2>
+        </div>
+        
+        <div class="analytics-header">
+          <div class="ah-label">Total Spent This Month</div>
+          <div class="ah-value font-numbers">€8,143<span class="ah-cents">.50</span></div>
+        </div>
+
+        <!-- Area Chart -->
+        <div class="chart-container clean-chart">
+          <canvas id="area-chart"></canvas>
+        </div>
+
+        <div class="section-title">Top Categories</div>
+        <div class="ios-category-list" id="category-breakdown">
+          <!-- Populated by JS -->
+        </div>
+
+        <div style="height: 100px;"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="screen-settings" class="app-screen">
+      <div class="screen-content">
+        <div class="profile-header-ios">
+          <div class="ph-avatar">HB</div>
+          <div class="ph-info">
+            <h3>Haythem Boumedine</h3>
+            <p>Metal Member • Since 2021</p>
+          </div>
+          <button class="qr-btn"><i class="fa-solid fa-qrcode"></i></button>
+        </div>
+
+        <div class="ios-settings-list">
+          <div class="ios-group-label">Account</div>
+          <div class="ios-group">
+            <div class="ios-item">
+              <div class="ios-item-left">
+                <div class="ios-icon blue"><i class="fa-solid fa-user"></i></div>
+                <span>Personal Details</span>
+              </div>
+              <i class="fa-solid fa-chevron-right chevron"></i>
+            </div>
+            <div class="ios-item">
+              <div class="ios-item-left">
+                <div class="ios-icon gray"><i class="fa-solid fa-building-columns"></i></div>
+                <span>Account Limits</span>
+              </div>
+              <i class="fa-solid fa-chevron-right chevron"></i>
+            </div>
+          </div>
+
+          <div class="ios-group-label">Security</div>
+          <div class="ios-group">
+            <div class="ios-item">
+              <div class="ios-item-left">
+                <div class="ios-icon green"><i class="fa-solid fa-face-viewfinder"></i></div>
+                <span>Face ID</span>
+              </div>
+              <div class="ios-toggle active"></div>
+            </div>
+            <div class="ios-item">
+              <div class="ios-item-left">
+                <div class="ios-icon red"><i class="fa-solid fa-location-dot"></i></div>
+                <span>Location Security</span>
+              </div>
+              <div class="ios-toggle"></div>
+            </div>
+          </div>
+          
+          <div class="ios-group-label">Support</div>
+          <div class="ios-group">
+            <div class="ios-item">
+              <div class="ios-item-left">
+                <div class="ios-icon black"><i class="fa-solid fa-circle-question"></i></div>
+                <span>Help Center</span>
+              </div>
+              <i class="fa-solid fa-chevron-right chevron"></i>
+            </div>
+          </div>
+
+          <button class="ios-btn-destructive" id="logout-btn">
+            Log Out
+          </button>
+        </div>
+
+        <div style="height: 100px;"></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-screen="dashboard">
+        <i class="fa-solid fa-house"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-btn" data-screen="transactions">
+        <i class="fa-solid fa-list-ul"></i>
+        <span>History</span>
+      </button>
+      <button class="nav-btn center-btn" data-screen="cards">
+        <div class="center-ring">
+          <i class="fa-solid fa-credit-card"></i>
+        </div>
+      </button>
+      <button class="nav-btn" data-screen="stats">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Analytics</span>
+      </button>
+      <button class="nav-btn" data-screen="settings">
+        <i class="fa-solid fa-gear"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+  </div><!-- /#app -->
+
+  <!-- TRANSFER MODAL -->
+  <div id="transfer-modal" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3>Send Money</h3>
+        <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="recipients">
+          <div class="rec-label">Recent Payees</div>
+          <div class="rec-list">
+            <div class="recipient active">
+              <div class="rec-avatar" style="background: #0066FF">AM</div>
+              <span>Alex M.</span>
+            </div>
+            <div class="recipient">
+              <div class="rec-avatar" style="background: #34C759">SJ</div>
+              <span>Sara J.</span>
+            </div>
+            <div class="recipient add-new">
+              <div class="rec-avatar add"><i class="fa-solid fa-plus"></i></div>
+              <span>New</span>
+            </div>
+          </div>
+        </div>
+        <div class="amount-input-section">
+          <div class="amount-display">
+            <span class="am-currency">€</span>
+            <span class="am-value" id="transfer-amount-display">0</span>
+          </div>
+          <div class="amount-hint">Available: €53,782.45</div>
+        </div>
+        <div class="numpad">
+          <button class="num-btn" data-val="1">1</button>
+          <button class="num-btn" data-val="2">2</button>
+          <button class="num-btn" data-val="3">3</button>
+          <button class="num-btn" data-val="4">4</button>
+          <button class="num-btn" data-val="5">5</button>
+          <button class="num-btn" data-val="6">6</button>
+          <button class="num-btn" data-val="7">7</button>
+          <button class="num-btn" data-val="8">8</button>
+          <button class="num-btn" data-val="9">9</button>
+          <button class="num-btn" data-val=".">.</button>
+          <button class="num-btn" data-val="0">0</button>
+          <button class="num-btn del-btn" data-val="del"><i class="fa-solid fa-delete-left"></i></button>
+        </div>
+        <button class="btn-primary send-confirm" id="confirm-send">
+          Send Securely
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS TOAST -->
+  <div id="success-toast" class="success-toast hidden">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-msg">Transfer successful</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
