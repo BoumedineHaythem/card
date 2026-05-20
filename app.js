@@ -203,6 +203,104 @@ document.addEventListener('DOMContentLoaded', () => {
     // ════════════════════════════════════════════
     // 5. TRANSACTIONS (Grouped iOS Style)
     // ════════════════════════════════════════════
+    // ════════════════════════════════════════════
+    // 6. SMART PWA INSTALLATION (Android & iOS)
+    // ════════════════════════════════════════════
+    let deferredPrompt;
+    
+    // UI Elements
+    const installPopup = document.getElementById('install-prompt');
+    const btnPopupInstall = document.getElementById('install-btn');
+    const btnPopupDismiss = document.getElementById('install-dismiss');
+    
+    const settingsInstallGroup = document.getElementById('pwa-install-group');
+    const settingsInstallLabel = document.getElementById('pwa-install-label');
+    const settingsInstallBtn = document.getElementById('settings-install-btn');
+    
+    const iosModal = document.getElementById('ios-install-modal');
+    const closeIosModal = document.getElementById('close-ios-modal');
+
+    // Detect if device is iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // Detect if app is already installed (standalone mode)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    // Only show install options if NOT already installed
+    if (!isStandalone) {
+        
+        // --- ANDROID / CHROME LOGIC ---
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show popup after 4 seconds
+            setTimeout(() => {
+                if (installPopup) installPopup.classList.remove('hidden');
+            }, 4000);
+
+            // Show persistent button in Settings
+            if (settingsInstallGroup) settingsInstallGroup.style.display = 'block';
+            if (settingsInstallLabel) settingsInstallLabel.style.display = 'block';
+        });
+
+        const triggerNativeInstall = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    if (installPopup) installPopup.classList.add('hidden');
+                    if (settingsInstallGroup) settingsInstallGroup.style.display = 'none';
+                    if (settingsInstallLabel) settingsInstallLabel.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        };
+
+        if (btnPopupInstall) btnPopupInstall.addEventListener('click', triggerNativeInstall);
+
+        // --- IOS LOGIC ---
+        if (isIOS) {
+            // Apple doesn't support beforeinstallprompt. We manually show the settings button.
+            if (settingsInstallGroup) settingsInstallGroup.style.display = 'block';
+            if (settingsInstallLabel) settingsInstallLabel.style.display = 'block';
+        }
+
+        // --- SETTINGS BUTTON CLICK HANDLER ---
+        if (settingsInstallBtn) {
+            settingsInstallBtn.addEventListener('click', () => {
+                if (isIOS) {
+                    // Show iOS instructions
+                    iosModal.classList.remove('hidden');
+                } else {
+                    // Trigger Android/Chrome prompt
+                    triggerNativeInstall();
+                }
+            });
+        }
+    }
+
+    // Dismiss buttons
+    if (btnPopupDismiss) btnPopupDismiss.addEventListener('click', () => installPopup.classList.add('hidden'));
+    if (closeIosModal) closeIosModal.addEventListener('click', () => iosModal.classList.add('hidden'));
+
+    // Automatically hide UI if successfully installed while app is open
+    window.addEventListener('appinstalled', () => {
+        if (installPopup) installPopup.classList.add('hidden');
+        if (settingsInstallGroup) settingsInstallGroup.style.display = 'none';
+        if (settingsInstallLabel) settingsInstallLabel.style.display = 'none';
+        console.log('NeoBank installed successfully!');
+    });
+
+    // ════════════════════════════════════════════
+    // 7. SERVICE WORKER REGISTRATION
+    // ════════════════════════════════════════════
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('SW Registered:', reg.scope))
+                .catch(err => console.log('SW Registration Failed:', err));
+        });
+    }
 // ════════════════════════════════════════════
     // 5. TRANSACTIONS (Ultra-Clean Fintech Style)
     // ════════════════════════════════════════════
